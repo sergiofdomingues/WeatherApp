@@ -2,4 +2,8 @@
     <string name="app_name">WeatherApp</string>
     <string name="it_is_now">It is now</string>
     <string name="error_no_forecast_data">No forecast data available</string>
+    <string name="temperature_in_degrees">%d°</string>
+    <string name="temperature_title">Temperature</string>
+    <string name="now_weather_icon">Now weather icon</string>
+    <string name="weather_icon_of_the_day">Weather icon of the day</string>
 </resources>

@@ -4,7 +4,7 @@ import com.example.weatherapp.api.WeatherForecastService
 import com.example.weatherapp.api.response.FiveDayForecastResponse
 import com.example.weatherapp.model.ForecastElement
 import com.example.weatherapp.model.DayForecast
-import com.example.weatherapp.rx.toOperation
+import com.example.weatherapp.util.toOperation
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 

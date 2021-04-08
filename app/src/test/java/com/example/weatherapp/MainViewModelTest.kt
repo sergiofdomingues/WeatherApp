@@ -3,8 +3,8 @@ package com.example.weatherapp
 import com.example.weatherapp.factories.DayForecastFactory
 import com.example.weatherapp.factories.ForecastElementFactory
 import com.example.weatherapp.model.DayForecast
-import com.example.weatherapp.rx.Operation
 import com.example.weatherapp.usecase.GetWeatherForecast
+import com.example.weatherapp.util.Operation
 import com.example.weatherapp.viewmodel.MainViewModel
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock

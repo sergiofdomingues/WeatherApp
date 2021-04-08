@@ -3,8 +3,8 @@ package com.example.weatherapp.viewmodel
 import androidx.lifecycle.ViewModel
 import com.example.weatherapp.model.ForecastElement
 import com.example.weatherapp.model.DayForecast
-import com.example.weatherapp.rx.Operation
 import com.example.weatherapp.usecase.GetWeatherForecast
+import com.example.weatherapp.util.Operation
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.disposables.CompositeDisposable

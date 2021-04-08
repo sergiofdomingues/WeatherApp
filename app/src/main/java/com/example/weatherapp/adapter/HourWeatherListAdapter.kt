@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ItemTempHourForecastBinding
 import com.example.weatherapp.model.ForecastElement
 
@@ -28,7 +29,7 @@ class HourWeatherListAdapter(
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(hourForecast: ForecastElement) = with(itemView) {
             binding.dayIcon.load(hourForecast.iconUrl)
-            binding.dayDegrees.text = "${hourForecast.temperature}\u00B0"
+            binding.dayDegrees.text = context.getString(R.string.temperature_in_degrees, hourForecast.temperature)
             binding.dayHour.text = hourForecast.dateTimeInfo?.hourStr ?: ""
         }
     }

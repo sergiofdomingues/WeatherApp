@@ -1,7 +1,6 @@
 package com.example.weatherapp.ui
 
 import android.os.Bundle
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -9,20 +8,16 @@ import coil.load
 import com.example.weatherapp.BaseActivity
 import com.example.weatherapp.R
 import com.example.weatherapp.adapter.FiveDayForecastAdapter
+import com.example.weatherapp.chart.LineChartBuilder
 import com.example.weatherapp.databinding.ActivityMainBinding
 import com.example.weatherapp.model.DayForecast
 import com.example.weatherapp.model.ForecastElement
-import com.example.weatherapp.rx.AutoDisposable
+import com.example.weatherapp.util.AutoDisposable
 import com.example.weatherapp.util.ViewModelFactory
 import com.example.weatherapp.viewmodel.MainViewModel
 import com.example.weatherapp.viewmodel.MainViewModel.ErrorName.NetworkError
 import com.example.weatherapp.viewmodel.MainViewModel.ErrorName.NoDataAvailable
-import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.components.YAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.XAxisValueFormatter
 import com.github.mikephil.charting.formatter.YAxisValueFormatter
 import com.github.mikephil.charting.utils.ViewPortHandler
@@ -36,6 +31,9 @@ class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var autoDisposable: AutoDisposable
+
+    @Inject
+    lateinit var chartBuilder: LineChartBuilder
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory<MainViewModel>
@@ -70,7 +68,7 @@ class MainActivity : BaseActivity() {
             .todayForecastChartData()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                drawChart(it)
+                chartBuilder.drawChart(it, binding.todayForecastChart)
             }
             .addToAutoDisposable()
 
@@ -118,63 +116,9 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setCurrentWeatherData(weather: ForecastElement) {
-        binding.todayDegrees.text = "${weather.temperature}\u00B0"
+        binding.todayDegrees.text =
+            resources.getString(R.string.temperature_in_degrees, weather.temperature)
         binding.nowIcon.load(weather.iconUrl)
-    }
-
-    private fun drawChart(tempHour: Map<String, String>) {
-        setupChartSettings()
-
-        // Hours (x axis data)
-        val xAxisLabels = mutableListOf<String>()
-        tempHour.values.forEach { xAxisLabels.add(it) }
-
-        // Temperatures (y axis data)
-        val lineEntry = mutableListOf<Entry>()
-        tempHour.keys.forEachIndexed { index, temp ->
-            lineEntry.add(
-                Entry(temp.toFloat(), index)
-            )
-        }
-
-        val lineDataSet = LineDataSet(lineEntry, "Temperature")
-        lineDataSet.color = ContextCompat.getColor(this, R.color.DodgerBlue)
-        lineDataSet.lineWidth = 4f
-        lineDataSet.setDrawCubic(true)
-
-        val data = LineData(xAxisLabels, lineDataSet)
-        binding.todayForecastChart.data = data
-        binding.todayForecastChart.animateXY(1000, 1000)
-    }
-
-    private fun setupChartSettings() {
-        // X axis
-        binding.todayForecastChart.xAxis.apply {
-            position = XAxisPosition.BOTTOM
-            setDrawGridLines(false)
-            labelRotationAngle = 315f
-            valueFormatter = ClaimsXAxisValueFormatter()
-            setDrawLimitLinesBehindData(false)
-        }
-
-        // Y right axis
-        binding.todayForecastChart.axisRight.apply {
-            removeAllLimitLines()
-            valueFormatter = ClaimsYAxisValueFormatter()
-        }
-
-        // Y left axis
-        binding.todayForecastChart.axisLeft.apply {
-            setDrawLabels(false)
-            removeAllLimitLines()
-            isEnabled = false
-        }
-
-        binding.todayForecastChart.apply {
-            setDescription(null)
-            setScaleEnabled(false)
-            legend.position = Legend.LegendPosition.ABOVE_CHART_LEFT
-        }
     }
 
     private fun showError(error: MainViewModel.Error) {
