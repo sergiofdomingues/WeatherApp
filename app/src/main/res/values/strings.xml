@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">WeatherApp</string>
+    <string name="it_is_now">It is now</string>
+    <string name="error_no_forecast_data">No forecast data available</string>
+</resources>
