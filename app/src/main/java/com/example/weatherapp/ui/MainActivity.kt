@@ -12,29 +12,21 @@ import com.example.weatherapp.chart.LineChartBuilder
 import com.example.weatherapp.databinding.ActivityMainBinding
 import com.example.weatherapp.model.DayForecast
 import com.example.weatherapp.model.ForecastElement
-import com.example.weatherapp.util.AutoDisposable
 import com.example.weatherapp.util.ViewModelFactory
 import com.example.weatherapp.viewmodel.MainViewModel
 import com.example.weatherapp.viewmodel.MainViewModel.ErrorName.NetworkError
 import com.example.weatherapp.viewmodel.MainViewModel.ErrorName.NoDataAvailable
+import com.example.weatherapp.viewmodel.MainViewModel.ForecastData
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.formatter.XAxisValueFormatter
 import com.github.mikephil.charting.formatter.YAxisValueFormatter
 import com.github.mikephil.charting.utils.ViewPortHandler
-import com.jakewharton.rxbinding2.support.v4.widget.refreshes
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import javax.inject.Inject
-
 
 class MainActivity : BaseActivity() {
 
     @Inject
-    lateinit var autoDisposable: AutoDisposable
-
-    @Inject
     lateinit var chartBuilder: LineChartBuilder
-
     @Inject
     lateinit var viewModelFactory: ViewModelFactory<MainViewModel>
     private val viewModel by lazy {
@@ -49,66 +41,33 @@ class MainActivity : BaseActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         component.inject(this)
-        autoDisposable.bindTo(this.lifecycle)
 
         binding.dailyWeatherForecast.layoutManager =
             LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
-        viewModel.init()
+        binding.container.setOnRefreshListener {
+            viewModel.onRefresh()
+        }
 
-        viewModel
-            .currentWeather()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                setCurrentWeatherData(it)
-            }
-            .addToAutoDisposable()
+        viewModel.combinedForecastData().observe(this) {
+            setupWeatherForecastData(it)
+        }
 
-        viewModel
-            .todayForecastChartData()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                chartBuilder.drawChart(it, binding.todayForecastChart)
-            }
-            .addToAutoDisposable()
+        viewModel.errors().observe(this) { error ->
+            error?.let { showError(it) }
+        }
 
-        viewModel
-            .fiveDayForecast()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                setFiveDayForecastData(it)
-            }
-            .addToAutoDisposable()
+        viewModel.isLoading().observe(this) { loading ->
+            loading?.let { binding.container.isRefreshing = it }
+        }
 
-        viewModel
-            .errors()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                showError(it)
-            }
-            .addToAutoDisposable()
-
-        viewModel
-            .isLoading()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                binding.container.isRefreshing = it
-            }
-            .addToAutoDisposable()
-
-        binding.container
-            .refreshes()
-            .subscribe {
-                viewModel.onRefresh()
-            }
-            .addToAutoDisposable()
-
-        binding.container.isRefreshing = true
+        viewModel.onRefresh()
     }
 
-    override fun onDestroy() {
-        viewModel.onCleared()
-        super.onDestroy()
+    private fun setupWeatherForecastData(forecast: ForecastData) {
+        setCurrentWeatherData(forecast.currentWeather)
+        chartBuilder.drawChart(forecast.todayForecast, binding.todayForecastChart)
+        setFiveDayForecastData(forecast.fiveDayForecast)
     }
 
     private fun setFiveDayForecastData(fiveDayForecast: List<DayForecast>) {
@@ -126,10 +85,6 @@ class MainActivity : BaseActivity() {
             NoDataAvailable -> messageManager.showError(R.string.error_no_forecast_data)
             NetworkError -> messageManager.showError(error.message)
         }
-    }
-
-    private fun Disposable.addToAutoDisposable() {
-        autoDisposable.add(this)
     }
 
     class ClaimsYAxisValueFormatter : YAxisValueFormatter {

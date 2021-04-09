@@ -2,23 +2,22 @@ package com.example.weatherapp.usecase
 
 import com.example.weatherapp.api.WeatherForecastService
 import com.example.weatherapp.api.response.FiveDayForecastResponse
-import com.example.weatherapp.model.ForecastElement
 import com.example.weatherapp.model.DayForecast
-import com.example.weatherapp.util.toOperation
-import io.reactivex.schedulers.Schedulers
+import com.example.weatherapp.model.ForecastElement
+import com.example.weatherapp.util.wrapToOperation
 import javax.inject.Inject
 
 class GetWeatherForecast @Inject constructor(private val weatherForecastService: WeatherForecastService) {
 
-    fun currentWeather(cityName: String) = weatherForecastService.getCurrentWeather(cityName)
-        .subscribeOn(Schedulers.io())
-        .map { it.toModel() }
-        .toOperation()
+    suspend fun currentWeather(cityName: String) =
+        weatherForecastService.getCurrentWeather(cityName)
+            .toModel()
+            .wrapToOperation()
 
-    fun fiveDayForecast(cityName: String) = weatherForecastService.getFiveDayForecast(cityName)
-        .subscribeOn(Schedulers.io())
-        .map { it.toListOfDays() }
-        .toOperation()
+    suspend fun fiveDayForecast(cityName: String) =
+        weatherForecastService.getFiveDayForecast(cityName)
+            .toListOfDays()
+            .wrapToOperation()
 
     private fun FiveDayForecastResponse.toListOfDays(): List<DayForecast> {
 
@@ -31,7 +30,7 @@ class GetWeatherForecast @Inject constructor(private val weatherForecastService:
         return modelList.groupBy { weatherData -> weatherData.dateTimeInfo?.dayStr }.entries.map {
             DayForecast(
                 readableDate = it.value.first().dateTimeInfo?.readableDate ?: "",
-                hours = it.value
+                hourlyForecastList = it.value
             )
         }
     }

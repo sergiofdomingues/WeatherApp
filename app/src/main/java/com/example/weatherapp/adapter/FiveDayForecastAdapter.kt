@@ -30,7 +30,7 @@ class FiveDayForecastAdapter(
             binding.title.text = day.readableDate
             binding.hourWeatherList.apply {
                 layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
-                adapter = HourWeatherListAdapter(day.hours)
+                adapter = HourWeatherListAdapter(day.hourlyForecastList)
             }
         }
     }

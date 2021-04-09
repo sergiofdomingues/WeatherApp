@@ -1,127 +1,109 @@
 package com.example.weatherapp.viewmodel
 
-import androidx.lifecycle.ViewModel
-import com.example.weatherapp.model.ForecastElement
+import androidx.lifecycle.*
 import com.example.weatherapp.model.DayForecast
+import com.example.weatherapp.model.ForecastElement
 import com.example.weatherapp.usecase.GetWeatherForecast
 import com.example.weatherapp.util.Operation
-import com.jakewharton.rxrelay2.BehaviorRelay
-import com.jakewharton.rxrelay2.PublishRelay
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(
     private val getWeatherForecast: GetWeatherForecast
 ) : ViewModel() {
 
-    private val disposables by lazy { CompositeDisposable() }
-
-    // Input
-    private lateinit var refreshes: PublishRelay<Unit>
-
     // Intermediate
-    private lateinit var getCurrentWeather: PublishRelay<Unit>
-    private lateinit var getForecast: PublishRelay<Unit>
-    private lateinit var todayForecast: BehaviorRelay<DayForecast>
+    private val currentWeather: MutableLiveData<ForecastElement> = MutableLiveData(null)
+    private val todayForecastChartData: MutableLiveData<Map<String, String>> = MutableLiveData(null)
+    private val fiveDayForecast: MutableLiveData<List<DayForecast>> = MutableLiveData(null)
 
-    // Output
-    private lateinit var currentWeather: BehaviorRelay<ForecastElement>
-    private lateinit var todayForecastChartData: BehaviorRelay<Map<String, String>>
-    private lateinit var fiveDayForecast: BehaviorRelay<List<DayForecast>>
-    private lateinit var errors: BehaviorRelay<Error>
-    private lateinit var isLoading: PublishRelay<Boolean>
+    // Output data
+    private val errors: MutableLiveData<Error?> = MutableLiveData(null)
+    private val isLoading: MutableLiveData<Boolean?> = MutableLiveData(null)
+    private val combinedForecastData: LiveData<ForecastData> =
+        zipLiveData(currentWeather, todayForecastChartData, fiveDayForecast)
 
-    fun init() {
-        resetStreams()
-
-        getCurrentWeather
-            .flatMapSingle { getWeatherForecast.currentWeather(City) }
-            .subscribe {
-                when (it) {
-                    is Operation.Success<ForecastElement> -> {
-                        currentWeather.accept(it.result)
-                    }
-                    is Operation.Error<ForecastElement> -> {
-                        errors.accept(Error(ErrorName.NetworkError, it.throwable.message))
-                    }
-                }
-            }
-            .addTo(disposables)
-
-        getForecast
-            .flatMapSingle { getWeatherForecast.fiveDayForecast(City) }
-            .subscribe {
-                when (it) {
-                    is Operation.Success<List<DayForecast>> -> {
-                        if (it.result.isNotEmpty()) {
-                            todayForecast.accept(it.result.first())
-                            fiveDayForecast.accept(it.result.drop(1))
-                        } else {
-                            errors.accept(Error(ErrorName.NoDataAvailable))
-                        }
-                    }
-                    is Operation.Error<List<DayForecast>> -> {
-                        errors.accept(Error(ErrorName.NetworkError, it.throwable.message))
-                    }
-                }
-                isLoading.accept(false)
-            }
-            .addTo(disposables)
-
-        // Mapping to Map<Temperature, Hour>
-        todayForecast
-            .map { dayForecast ->
-                dayForecast.hours.map {
-                    it.temperature.toString() to (it.dateTimeInfo?.hourStr ?: "")
-                }.toMap()
-            }
-            .subscribe {
-                todayForecastChartData.accept(it)
-            }
-            .addTo(disposables)
-
-        refreshes
-            .doOnNext { isLoading.accept(true) }
-            .subscribe {
-                getCurrentWeather.accept(Unit)
-                getForecast.accept(Unit)
-            }
-            .addTo(disposables)
-
-        refreshes.accept(Unit)
+    private suspend fun fetchData() {
+        isLoading.postValue(true)
+        castCurrentWeatherResponse(getWeatherForecast.currentWeather(City))
+        castFiveDayForecastResponse(getWeatherForecast.fiveDayForecast(City))
     }
 
-    private fun resetStreams() {
-        currentWeather = BehaviorRelay.create()
-        todayForecast = BehaviorRelay.create()
-        fiveDayForecast = BehaviorRelay.create()
-        todayForecastChartData = BehaviorRelay.create()
-        getCurrentWeather = PublishRelay.create()
-        getForecast = PublishRelay.create()
-        refreshes = PublishRelay.create()
-        isLoading = PublishRelay.create()
-        errors = BehaviorRelay.create()
+    private fun castCurrentWeatherResponse(response: Operation<ForecastElement>) {
+        when (response) {
+            is Operation.Success<ForecastElement> -> currentWeather.postValue(response.result)
+            is Operation.Error<ForecastElement> -> errors.postValue(
+                Error(ErrorName.NetworkError, response.throwable.message)
+            )
+        }
     }
 
-    public override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
+    private fun castFiveDayForecastResponse(response: Operation<List<DayForecast>>) {
+        when (response) {
+            is Operation.Success<List<DayForecast>> -> {
+                if (response.result.isNotEmpty()) {
+                    todayForecastChartData.postValue(response.result.first().mapToChartData())
+                    fiveDayForecast.postValue(response.result.drop(1))
+                } else errors.postValue(Error(ErrorName.NoDataAvailable))
+            }
+            is Operation.Error<List<DayForecast>> -> errors.postValue(
+                Error(ErrorName.NetworkError, response.throwable.message)
+            )
+        }
     }
 
     // Input
 
-    fun onRefresh() = refreshes.accept(Unit)
+    fun onRefresh() = viewModelScope.launch { fetchData() }
 
     // Output
 
-    fun currentWeather() = currentWeather.hide()
-    fun fiveDayForecast() = fiveDayForecast.hide()
-    fun todayForecastChartData() = todayForecastChartData.hide()
-    fun errors() = errors.hide()
-    fun isLoading() = isLoading.hide()
+    fun combinedForecastData(): LiveData<ForecastData> = combinedForecastData
+    fun isLoading(): LiveData<Boolean?> = isLoading
+    fun errors(): LiveData<Error?> = errors
 
     // Helpers
+
+    // Mapping to Map<Temperature, Hour>
+    private fun DayForecast.mapToChartData() = hourlyForecastList.map {
+        it.temperature.toString() to (it.dateTimeInfo?.hourStr ?: "")
+    }.toMap()
+
+    private fun zipLiveData(
+        currentWeather: LiveData<ForecastElement>,
+        todayForecastChartData: LiveData<Map<String, String>>,
+        fiveDayForecast: LiveData<List<DayForecast>>
+    ): LiveData<ForecastData> {
+        return MediatorLiveData<ForecastData>().apply {
+            var lastCurrentWeather: ForecastElement? = null
+            var lastTodayForecast: Map<String, String>? = null
+            var lastFiveDayForecast: List<DayForecast>? = null
+
+            fun update() {
+                lastCurrentWeather?.let { current ->
+                    lastTodayForecast?.let { today ->
+                        lastFiveDayForecast?.let { fiveDay ->
+                            this.value = ForecastData(current, today, fiveDay)
+                            isLoading.postValue(false)
+                        }
+                    }
+                }
+            }
+
+            addSource(currentWeather) {
+                lastCurrentWeather = it
+                update()
+            }
+            addSource(todayForecastChartData) {
+                lastTodayForecast = it
+                update()
+            }
+            addSource(fiveDayForecast) {
+                lastFiveDayForecast = it
+                update()
+            }
+        }
+    }
 
     enum class ErrorName {
         NoDataAvailable,
@@ -131,6 +113,12 @@ class MainViewModel @Inject constructor(
     data class Error(
         val errorName: ErrorName,
         val message: String? = null
+    )
+
+    data class ForecastData(
+        val currentWeather: ForecastElement,
+        val todayForecast: Map<String, String>,
+        val fiveDayForecast: List<DayForecast>
     )
 
     companion object {
