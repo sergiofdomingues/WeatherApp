@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -54,12 +55,9 @@ dependencies {
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2'
 
-    // Dagger
-    api 'com.google.dagger:dagger:2.31.2'
-    api 'com.google.dagger:dagger-android:2.27'
-    api 'com.google.dagger:dagger-android-support:2.27'
-    kapt 'com.google.dagger:dagger-compiler:2.31.2'
-    kapt 'com.google.dagger:dagger-android-processor:2.27'
+    // Hilt DI
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-compiler:$hilt_version"
 
     // Image loader
     implementation("io.coil-kt:coil:1.1.1")

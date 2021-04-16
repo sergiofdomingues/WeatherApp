@@ -21,12 +21,15 @@ import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.formatter.XAxisValueFormatter
 import com.github.mikephil.charting.formatter.YAxisValueFormatter
 import com.github.mikephil.charting.utils.ViewPortHandler
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : BaseActivity() {
 
     @Inject
     lateinit var chartBuilder: LineChartBuilder
+
     @Inject
     lateinit var viewModelFactory: ViewModelFactory<MainViewModel>
     private val viewModel by lazy {
@@ -40,7 +43,6 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        component.inject(this)
 
         binding.dailyWeatherForecast.layoutManager =
             LinearLayoutManager(this, RecyclerView.VERTICAL, false)
