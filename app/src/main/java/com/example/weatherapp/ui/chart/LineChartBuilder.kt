@@ -1,4 +1,4 @@
-package com.example.weatherapp.chart
+package com.example.weatherapp.ui.chart
 
 import android.content.Context
 import androidx.core.content.ContextCompat

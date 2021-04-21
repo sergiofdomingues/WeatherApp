@@ -5,9 +5,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.example.weatherapp.factories.DayForecastFactory
 import com.example.weatherapp.factories.ForecastElementFactory
-import com.example.weatherapp.usecase.GetWeatherForecast
-import com.example.weatherapp.util.Operation
-import com.example.weatherapp.viewmodel.MainViewModel
+import com.example.weatherapp.data.Repository
+import com.example.weatherapp.utils.Operation
+import com.example.weatherapp.domain.viewmodel.MainViewModel
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -33,7 +33,7 @@ class MainViewModelTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-    private val getWeatherForecast = mock<GetWeatherForecast>()
+    private val getWeatherForecast = mock<Repository>()
     private lateinit var viewModel: MainViewModel
     private val forecastDataObserver = mock<Observer<MainViewModel.ForecastData>>()
     private val isLoadingObserver = mock<Observer<Boolean?>>()

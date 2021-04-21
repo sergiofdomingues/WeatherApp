@@ -5,18 +5,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.example.weatherapp.BaseActivity
 import com.example.weatherapp.R
-import com.example.weatherapp.adapter.FiveDayForecastAdapter
-import com.example.weatherapp.chart.LineChartBuilder
 import com.example.weatherapp.databinding.ActivityMainBinding
-import com.example.weatherapp.model.DayForecast
-import com.example.weatherapp.model.ForecastElement
-import com.example.weatherapp.util.ViewModelFactory
-import com.example.weatherapp.viewmodel.MainViewModel
-import com.example.weatherapp.viewmodel.MainViewModel.ErrorName.NetworkError
-import com.example.weatherapp.viewmodel.MainViewModel.ErrorName.NoDataAvailable
-import com.example.weatherapp.viewmodel.MainViewModel.ForecastData
+import com.example.weatherapp.domain.viewmodel.MainViewModel
+import com.example.weatherapp.domain.viewmodel.MainViewModel.ErrorName.NetworkError
+import com.example.weatherapp.domain.viewmodel.MainViewModel.ErrorName.NoDataAvailable
+import com.example.weatherapp.domain.viewmodel.MainViewModel.ForecastData
+import com.example.weatherapp.domain.model.DayForecast
+import com.example.weatherapp.domain.model.ForecastElement
+import com.example.weatherapp.ui.adapter.FiveDayForecastAdapter
+import com.example.weatherapp.ui.chart.LineChartBuilder
+import com.example.weatherapp.utils.ViewModelFactory
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.formatter.XAxisValueFormatter
 import com.github.mikephil.charting.formatter.YAxisValueFormatter
@@ -47,28 +46,24 @@ class MainActivity : BaseActivity() {
         binding.dailyWeatherForecast.layoutManager =
             LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
-        binding.container.setOnRefreshListener {
-            viewModel.onRefresh()
+        binding.container.setOnRefreshListener { viewModel.onRefresh() }
+
+        viewModel.weatherConditions.observe(this) { forecastData ->
+            forecastData?.let { setupWeatherForecastData(it) }
         }
 
-        viewModel.combinedForecastData().observe(this) {
-            setupWeatherForecastData(it)
+        viewModel.isLoading.observe(this) {
+            binding.container.isRefreshing = it
         }
 
-        viewModel.errors().observe(this) { error ->
+        viewModel.errors.observe(this) { error ->
             error?.let { showError(it) }
         }
-
-        viewModel.isLoading().observe(this) { loading ->
-            loading?.let { binding.container.isRefreshing = it }
-        }
-
-        viewModel.onRefresh()
     }
 
     private fun setupWeatherForecastData(forecast: ForecastData) {
-        setCurrentWeatherData(forecast.currentWeather)
-        chartBuilder.drawChart(forecast.todayForecast, binding.todayForecastChart)
+        forecast.currentWeather?.let { setCurrentWeatherData(it) }
+        forecast.todayForecast?.let { chartBuilder.drawChart(it, binding.todayForecastChart) }
         setFiveDayForecastData(forecast.fiveDayForecast)
     }
 
