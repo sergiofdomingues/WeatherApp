@@ -1,4 +1,4 @@
-package com.example.weatherapp.adapter
+package com.example.weatherapp.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.weatherapp.R
 import com.example.weatherapp.databinding.ItemTempHourForecastBinding
-import com.example.weatherapp.model.ForecastElement
+import com.example.weatherapp.domain.model.ForecastElement
 
 class HourWeatherListAdapter(
     private val hours: List<ForecastElement>

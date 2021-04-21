@@ -1,6 +1,6 @@
-package com.example.weatherapp.util
+package com.example.weatherapp.utils
 
-import com.example.weatherapp.model.ForecastElement
+import com.example.weatherapp.domain.model.ForecastElement
 import java.text.SimpleDateFormat
 import java.util.*
 
