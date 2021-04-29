@@ -1,4 +1,4 @@
-package com.example.weatherapp.chart
+package com.example.weatherapp.ui.chart
 
 import android.content.Context
 import androidx.core.content.ContextCompat
@@ -10,9 +10,12 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject
 
-class LineChartBuilder @Inject constructor(private val context: Context) {
+class LineChartBuilder @Inject constructor(
+    @ActivityContext private val context: Context
+) {
 
     fun drawChart(tempHour: Map<String, String>, lineChart: LineChart) {
         setupChartSettings(lineChart)

@@ -1,25 +1,20 @@
 package com.example.weatherapp.di
 
-
 import com.example.weatherapp.api.WeatherForecastService
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
-import io.reactivex.schedulers.Schedulers
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
+@InstallIn(SingletonComponent::class)
 @Module
-class NetworkModule {
-
-    @Provides
-    @Singleton
-    fun provideCallAdapterFactory(): RxJava2CallAdapterFactory =
-        RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io())
+object NetworkModule {
 
     @Provides
     fun provideConverterFactory(gson: Gson): GsonConverterFactory =
@@ -38,13 +33,11 @@ class NetworkModule {
     @Provides
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
-        callAdapterFactory: RxJava2CallAdapterFactory,
         converterFactory: GsonConverterFactory,
     ) = Retrofit.Builder()
         .baseUrl("http://api.openweathermap.org/")
         .client(okHttpClient)
         .addConverterFactory(converterFactory)
-        .addCallAdapterFactory(callAdapterFactory)
         .build()
 
     @Provides

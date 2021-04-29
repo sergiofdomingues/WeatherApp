@@ -1,7 +1,7 @@
-package com.example.weatherapp.api.response
+package com.example.weatherapp.data.response
 
-import com.example.weatherapp.model.ForecastElement
-import com.example.weatherapp.util.DateFormat.formatDate
+import com.example.weatherapp.domain.model.ForecastElement
+import com.example.weatherapp.utils.DateFormat.formatDate
 import com.google.gson.annotations.SerializedName
 
 data class WeatherResponse(
