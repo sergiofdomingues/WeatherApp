@@ -21,6 +21,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:itemCount="1"
-        tools:listitem="@layout/item_temp_hour_forecast" />
+        tools:listitem="@layout/item_hour_temp_forecast" />
 
 </LinearLayout>

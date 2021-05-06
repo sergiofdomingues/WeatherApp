@@ -1,8 +1,8 @@
-package com.example.weatherapp.data.response
+package com.example.weatherapp.framework.network
 
 import com.google.gson.annotations.SerializedName
 
-class FiveDayForecastResponse {
+class FiveDayForecastResponse(
     @SerializedName("list")
     val forecastWeatherElements: List<WeatherResponse>? = null
-}
+)
