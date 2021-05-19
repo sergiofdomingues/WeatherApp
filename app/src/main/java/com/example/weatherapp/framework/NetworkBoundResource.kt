@@ -1,9 +1,9 @@
-package com.example.weatherapp.domain
+package com.example.weatherapp.framework
 
 import com.example.weatherapp.framework.network.FiveDayForecastResponse
-import com.example.weatherapp.domain.model.WeatherForecast
 import com.example.weatherapp.framework.network.WeatherResponse
-import com.example.weatherapp.utils.Resource.*
+import com.example.weatherapp.domain.Resource.*
+import com.example.weatherapp.domain.WeatherForecast
 import kotlinx.coroutines.flow.*
 import retrofit2.Response
 

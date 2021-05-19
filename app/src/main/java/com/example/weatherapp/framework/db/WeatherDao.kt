@@ -1,4 +1,4 @@
-package com.example.weatherapp.framework.database
+package com.example.weatherapp.framework.db
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow

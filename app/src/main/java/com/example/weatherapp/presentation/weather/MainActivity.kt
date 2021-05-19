@@ -1,4 +1,4 @@
-package com.example.weatherapp.presentation.ui
+package com.example.weatherapp.presentation.weather
 
 import android.os.Bundle
 import androidx.core.view.isVisible
@@ -7,17 +7,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.weatherapp.R
-import com.example.weatherapp.domain.model.WeatherForecast
 import com.example.weatherapp.databinding.ActivityMainBinding
-import com.example.weatherapp.domain.model.DayForecast
-import com.example.weatherapp.domain.model.ForecastElement
-import com.example.weatherapp.presentation.viewmodel.MainViewModel
+import com.example.weatherapp.domain.*
 import com.example.weatherapp.presentation.BaseActivity
-import com.example.weatherapp.domain.model.ErrorStatus
-import com.example.weatherapp.domain.model.ErrorStatus.ErrorType.*
-import com.example.weatherapp.utils.Resource
-import com.example.weatherapp.presentation.adapter.FiveDayForecastAdapter
-import com.example.weatherapp.utils.ViewModelFactory
+import com.example.weatherapp.domain.ErrorStatus.ErrorType.*
+import com.example.weatherapp.presentation.utils.ViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

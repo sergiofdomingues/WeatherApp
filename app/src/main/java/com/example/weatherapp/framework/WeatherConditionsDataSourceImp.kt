@@ -1,13 +1,14 @@
-package com.example.weatherapp.data
+package com.example.weatherapp.framework
 
 import androidx.room.withTransaction
-import com.example.weatherapp.domain.model.WeatherForecast
-import com.example.weatherapp.framework.network.WeatherForecastService
+import com.example.weatherapp.data.WeatherConditionsDataSource
+import com.example.weatherapp.domain.Resource
+import com.example.weatherapp.domain.WeatherForecast
+import com.example.weatherapp.framework.db.*
 import com.example.weatherapp.framework.network.FiveDayForecastResponse
-import com.example.weatherapp.domain.NetworkBoundResource
-import com.example.weatherapp.framework.database.*
+import com.example.weatherapp.framework.network.WeatherForecastService
 import com.example.weatherapp.framework.network.WeatherResponse
-import com.example.weatherapp.utils.ConnectionManager
+import com.example.weatherapp.presentation.utils.ConnectionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -18,20 +19,21 @@ import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
 
-class Repository @Inject constructor(
+class WeatherConditionsDataSourceImp @Inject constructor(
     private val db: WeatherDatabase,
     private val weatherDao: WeatherDao,
     private val weatherForecastService: WeatherForecastService,
     private val connectionManager: ConnectionManager
-) {
-    suspend fun getWeatherForecast(cityName: String) =
+) : WeatherConditionsDataSource {
+
+    override suspend fun get(city: String): Flow<Resource<WeatherForecast>> =
         withContext(Dispatchers.IO) {
             object : NetworkBoundResource() {
 
                 override suspend fun createCall(): Pair<Response<WeatherResponse>, Response<FiveDayForecastResponse>> =
                     coroutineScope {
-                        val current = async { weatherForecastService.getCurrentWeather(cityName) }
-                        val fiveDay = async { weatherForecastService.getFiveDayForecast(cityName) }
+                        val current = async { weatherForecastService.getCurrentWeather(city) }
+                        val fiveDay = async { weatherForecastService.getFiveDayForecast(city) }
                         Pair(current.await(), fiveDay.await())
                     }
 
