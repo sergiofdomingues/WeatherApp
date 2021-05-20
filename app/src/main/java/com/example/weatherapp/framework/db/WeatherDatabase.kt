@@ -1,8 +1,8 @@
-package com.example.weatherapp.framework.database
+package com.example.weatherapp.framework.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.weatherapp.framework.database.WeatherDatabase.Companion.DB_VERSION
+import com.example.weatherapp.framework.db.WeatherDatabase.Companion.DB_VERSION
 
 @Database(
     entities = [NowWeatherDbo::class, FiveDayElementDbo::class],

@@ -1,4 +1,4 @@
-package com.example.weatherapp.domain.model
+package com.example.weatherapp.domain
 
 data class WeatherForecast(
     val currentWeather: ForecastElement? = null,

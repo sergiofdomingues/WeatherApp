@@ -1,6 +1,6 @@
 package com.example.weatherapp.factories
 
-import com.example.weatherapp.domain.model.ForecastElement
+import com.example.weatherapp.domain.ForecastElement
 
 object DateTimeInfoFactory {
     fun build() =

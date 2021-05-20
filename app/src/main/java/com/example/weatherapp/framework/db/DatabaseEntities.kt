@@ -1,14 +1,14 @@
-package com.example.weatherapp.framework.database
+package com.example.weatherapp.framework.db
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.example.weatherapp.domain.model.WeatherForecast
-import com.example.weatherapp.domain.model.DayForecast
-import com.example.weatherapp.domain.model.ForecastElement
+import com.example.weatherapp.domain.DayForecast
+import com.example.weatherapp.domain.ForecastElement
+import com.example.weatherapp.domain.WeatherForecast
 import com.example.weatherapp.framework.network.FiveDayForecastResponse
 import com.example.weatherapp.framework.network.WeatherResponse
-import com.example.weatherapp.utils.DateFormat.formatDate
+import com.example.weatherapp.presentation.utils.DateFormat.formatDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

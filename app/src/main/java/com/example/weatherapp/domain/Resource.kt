@@ -1,7 +1,6 @@
-package com.example.weatherapp.utils
+package com.example.weatherapp.domain
 
-import com.example.weatherapp.domain.model.ErrorStatus
-import com.example.weatherapp.domain.model.ErrorStatus.ErrorType
+import com.example.weatherapp.domain.ErrorStatus.ErrorType
 
 sealed class Resource<out T>(
     val data: T? = null,
@@ -24,7 +23,11 @@ sealed class Resource<out T>(
             fun <T> unavailableFiveDayForecastData(data: T? = null) =
                 Error(ErrorStatus(ErrorType.UnavailableFiveDayForecast), data)
 
-            fun unknownError(msg: String) = Error(ErrorStatus(ErrorType.UnknownError, msg), null)
+            fun unknownError(msg: String) = Error(
+                ErrorStatus(
+                    ErrorType.UnknownError,
+                    msg
+                ), null)
         }
     }
 }
