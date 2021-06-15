@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui.adapter
+package com.example.weatherapp.presentation.weather
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapp.databinding.ItemDayForecastBinding
-import com.example.weatherapp.domain.model.DayForecast
+import com.example.weatherapp.domain.DayForecast
 
 class FiveDayForecastAdapter(
     private val days: List<DayForecast>

@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">WeatherApp</string>
     <string name="it_is_now">It is now</string>
-    <string name="error_no_forecast_data">No forecast data available</string>
+    <string name="error_no_now_data">No now weather data available</string>
+    <string name="error_no_five_day_forecast_data">No five day forecast data available</string>
     <string name="temperature_in_degrees">%d°</string>
     <string name="temperature_title">Temperature</string>
     <string name="now_weather_icon">Now weather icon</string>

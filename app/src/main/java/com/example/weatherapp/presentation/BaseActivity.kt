@@ -1,7 +1,6 @@
-package com.example.weatherapp.ui
+package com.example.weatherapp.presentation
 
 import androidx.appcompat.app.AppCompatActivity
-import com.example.weatherapp.utils.MessageManager
 import javax.inject.Inject
 
 abstract class BaseActivity : AppCompatActivity() {

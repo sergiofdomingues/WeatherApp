@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".ui.MainActivity">
+        tools:context=".presentation.weather.MainActivity">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -53,7 +53,8 @@
             android:id="@+id/todayForecastChart"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_margin="16dp" />
+            android:layout_margin="16dp"
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/dailyWeatherForecast"

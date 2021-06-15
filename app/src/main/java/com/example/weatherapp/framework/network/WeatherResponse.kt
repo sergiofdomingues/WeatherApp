@@ -1,7 +1,5 @@
-package com.example.weatherapp.data.response
+package com.example.weatherapp.framework.network
 
-import com.example.weatherapp.domain.model.ForecastElement
-import com.example.weatherapp.utils.DateFormat.formatDate
 import com.google.gson.annotations.SerializedName
 
 data class WeatherResponse(
@@ -29,14 +27,7 @@ data class WeatherResponse(
     var name: String? = null,
     @SerializedName("cod")
     var cod: Float = 0f
-) {
-    fun toModel() =
-        ForecastElement(
-            weather.first().icon?.let { "http://openweathermap.org/img/w/$it.png" } ?: "",
-            main?.temp?.toInt() ?: 0,
-            dateString?.let { formatDate(it) }
-        )
-}
+)
 
 class Weather(
     @SerializedName("id")
